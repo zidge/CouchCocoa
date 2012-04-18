@@ -345,6 +345,21 @@ static NSDateFormatter* getISO8601Formatter() {
     }
     return sFormatter;
 }
+// This function is not thread-safe, nor is the NSDateFormatter instance it returns.
+// Make sure that this function and the formatter are called on only one thread at a time.
+static NSDateFormatter* getExtendedISO8601Formatter() {
+    static NSDateFormatter* sExtFormatter;
+    if (!sExtFormatter) {
+        // Thanks to DenNukem's answer in http://stackoverflow.com/questions/399527/
+        sExtFormatter = [[NSDateFormatter alloc] init];
+        sExtFormatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+        sExtFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+        sExtFormatter.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar]
+                               autorelease];
+        sExtFormatter.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
+    }
+    return sExtFormatter;
+}
 
 
 + (NSString*) JSONObjectWithDate: (NSDate*)date {
@@ -360,7 +375,11 @@ static NSDateFormatter* getISO8601Formatter() {
     if (!string)
         return nil;
     @synchronized(self) {
-        return [getISO8601Formatter() dateFromString: string];
+        NSDate *newDate = [getISO8601Formatter() dateFromString: string];
+        if (!newDate) {
+            newDate = [getExtendedISO8601Formatter() dateFromString: string];
+        }
+        return newDate;
     }
 }
 
