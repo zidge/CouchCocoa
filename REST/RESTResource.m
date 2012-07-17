@@ -17,12 +17,7 @@
 
 #import "RESTInternal.h"
 #import "RESTCache.h"
-<<<<<<< HEAD
-#import "RESTBase64.h"
-=======
 #import "TDBase64.h"
->>>>>>> 912484b8b550ce1231a0d58beff742f8b83f8ea8
-
 
 @implementation RESTResource
 
@@ -174,11 +169,7 @@
     NSString* password = [request.URL password];
     if (username && password) {
         NSString *creds = [NSString stringWithFormat:@"%@:%@", username, password];
-<<<<<<< HEAD
-        creds = [RESTBase64 encode: [creds dataUsingEncoding:NSUTF8StringEncoding]];
-=======
         creds = [TDBase64 encode: [creds dataUsingEncoding:NSUTF8StringEncoding]];
->>>>>>> 912484b8b550ce1231a0d58beff742f8b83f8ea8
         [request addValue:[NSString stringWithFormat:@"Basic %@", creds] forHTTPHeaderField:@"Authorization"];
     }
 
