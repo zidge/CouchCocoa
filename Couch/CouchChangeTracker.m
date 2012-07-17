@@ -62,7 +62,7 @@
 
 - (NSString*) changesFeedPath {
     static NSString* const kModeNames[3] = {@"normal", @"longpoll", @"continuous"};
-    return [NSString stringWithFormat: @"_changes?feed=%@&heartbeat=300000&since=%u",
+    return [NSString stringWithFormat: @"_changes?feed=%@&heartbeat=45000&since=%u",
             kModeNames[_mode],
             _lastSequenceNumber];
 }
