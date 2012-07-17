@@ -61,6 +61,9 @@
     [_error release];
     [_filter release];
     [_filterParams release];
+    [_options release];
+    [_headers release];
+    [_oauth release];
     [super dealloc];
 }
 
@@ -72,12 +75,25 @@
 
 
 @synthesize pull=_pull, createTarget=_createTarget, continuous=_continuous,
-            filter=_filter, filterParams=_filterParams;
+            filter=_filter, filterParams=_filterParams, options=_options, headers=_headers,
+            OAuth=_oauth, localDatabase=_database;
 
 
 - (RESTOperation*) operationToStart: (BOOL)start {
-    NSString* source = _pull ? _remote.absoluteString : _database.relativePath;
-    NSString* target = _pull ? _database.relativePath : _remote.absoluteString;
+    id source = _pull ? _remote.absoluteString : _database.relativePath;
+    id target = _pull ? _database.relativePath : _remote.absoluteString;
+    if (_headers.count > 0 || _oauth != nil) {
+        // Convert 'source' or 'target' to a dictionary so we can add metadata to it:
+        id *param = _pull ? &source : &target;
+        *param = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                  *param, @"url",
+                  _headers, @"headers",
+                  nil];
+        if (_oauth) {
+            NSDictionary* auth = [NSDictionary dictionaryWithObject: _oauth forKey: @"oauth"];
+            [*param setObject: auth forKey: @"auth"];
+        }
+    }
     NSMutableDictionary* body = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                  source, @"source",
                                  target, @"target",
@@ -91,6 +107,9 @@
         if (_filterParams)
             [body setObject: _filterParams forKey: @"query_params"];
     }
+    if (_options)
+        [body addEntriesFromDictionary: _options];
+
     if (!start)
         [body setObject: (id)kCFBooleanTrue forKey: @"cancel"];
     RESTResource* replicate = [[[RESTResource alloc] initWithParent: _database.server 

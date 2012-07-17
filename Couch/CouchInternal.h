@@ -38,6 +38,7 @@ typedef void (^OnDatabaseChangeBlock)(CouchDocument*, BOOL externalChange);
 - (void) beginDocumentOperation: (CouchResource*)resource;
 - (void) endDocumentOperation: (CouchResource*)resource;
 - (void) onChange: (OnDatabaseChangeBlock)block;  // convenience for unit tests
+- (void) unretainDocumentCache;
 @end
 
 
@@ -73,6 +74,13 @@ typedef void (^OnDatabaseChangeBlock)(CouchDocument*, BOOL externalChange);
 - (id) initWithDatabase: (CouchDatabase*)database
                  remote: (NSURL*)remote;
 @end
+
+
+@interface CouchPersistentReplication ()
+@property (readonly) NSString* sourceURLStr;
+@property (readonly) NSString* targetURLStr;
+@end
+
 
 
 @interface CouchServer ()
