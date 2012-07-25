@@ -17,7 +17,13 @@
 
 #import "RESTInternal.h"
 #import "RESTCache.h"
-#import "TDBase64.h"
+
+@interface TDBase64 : NSObject
++ (NSString*) encode:(const void*) input length:(size_t) length;
++ (NSString*) encode:(NSData*) rawBytes;
++ (NSData*) decode:(const char*) string length:(size_t) inputLength;
++ (NSData*) decode:(NSString*) string;
+@end
 
 @implementation RESTResource
 
